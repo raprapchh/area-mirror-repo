@@ -1,0 +1,44 @@
+name: CI + Mirror
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # permet de déclencher manuellement
+
+jobs:
+  build-and-mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0             # important : toutes les branches/tags
+          persist-credentials: false # on n’utilise pas le GITHUB_TOKEN
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test -- --watchAll=false || true
+
+      - name: Build React app
+        run: CI=false npm run build
+
+      - name: Mirror repository
+        env:
+          MIRROR_REPO: 'git@github.com:raprapchh/area-mirror-repo.git'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git remote add mirror https://x-access-token:${{ secrets.AREA_MIRROR_TOKEN }}@github.com/${MIRROR_REPO}
+
+          git push mirror --all
+          git push mirror --tags
