@@ -1,10 +1,10 @@
-name: CI + Mirror
+name: CI + Mirror AREA
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:  # permet de déclencher manuellement
+  workflow_dispatch:
 
 jobs:
   build-and-mirror:
@@ -14,8 +14,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0             # important : toutes les branches/tags
-          persist-credentials: false # on n’utilise pas le GITHUB_TOKEN
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
